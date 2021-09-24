@@ -40,13 +40,20 @@ export const Device = ({ deviceInfo, nickname }) => {
     }
   };
   const determineDevice = device => {
-    switch (device) {
-      case 'desktop':
-        return deviceInfo.os.name + ' ' + deviceInfo.os.version;
-      case 'smartphone':
-        return deviceInfo.device.brand + ' ' + deviceInfo.device.model;
-      default:
-        return deviceInfo.os.name + ' ' + deviceInfo.os.version;
+    // switch (device) {
+    //   case 'desktop':
+    //     return deviceInfo.os.name + ' ' + deviceInfo.os.version;
+    //   case 'smartphone':
+    //     return deviceInfo.device.brand + ' ' + deviceInfo.device.model;
+    //   default:
+    //     return 'Unknown';
+    // }
+    if (device === 'desktop' && deviceInfo.os.name !== '') {
+      return deviceInfo.os.name + ' ' + deviceInfo.os.version;
+    } else if (device === 'smartphone' && deviceInfo.device.brand !== '') {
+      return deviceInfo.device.brand + ' ' + deviceInfo.device.model;
+    } else {
+      return 'Unknown';
     }
   };
   return (
