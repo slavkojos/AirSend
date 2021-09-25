@@ -57,6 +57,8 @@ export const Home = () => {
   const [filetoSend, setFile] = useState();
   const [fileName, setFileName] = useState('');
   const toast = useToast();
+  const toastIdRef = useRef();
+
   const spf = new SimplePeerFiles();
   const addNewPeer = peer => {
     peer.localAddress !== undefined
@@ -74,6 +76,21 @@ export const Home = () => {
     }
     //setConnectedPeers(prevPeers => [...prevPeers, peer]);
   };
+  const displayMesageToast = (message, nickname, peer) => {
+    toast({
+      position: 'top-right',
+      isClosable: true,
+      duration: 30000,
+      render: ({ onClose }) => (
+        <ChatMessage
+          message={message}
+          user={nickname}
+          peer={peer}
+          close={onClose}
+        />
+      ),
+    });
+  };
   useEffect(() => {
     p2pt.on('peerconnect', peer => {
       console.log('peer remote address', peer);
@@ -90,6 +107,7 @@ export const Home = () => {
     };
 
     p2pt.on('trackerconnect', async (tracker, stats) => {
+      console.log(tracker);
       console.log('connected to p2p network');
     });
     const prepareToRecieve = peer => {
@@ -138,6 +156,7 @@ export const Home = () => {
     p2pt.on('data', (peer, data) => {
       //console.log(data);
     });
+
     p2pt.on('msg', async (peer, msg) => {
       if (msg.type === 'device-info') {
         console.log('got the device info', msg.device);
@@ -145,23 +164,10 @@ export const Home = () => {
         peer.device = msg.device;
         setConnectedPeers(prevPeers => [...prevPeers, peer]);
       }
+
       if (msg.type === 'chat') {
         console.log('got the chat message', msg.message);
-        toast({
-          position: 'top-right',
-          status: 'warning',
-          isClosable: true,
-          render: () => (
-            <ChatMessage
-              message={msg.message}
-              user={peer.nickname}
-              peer={peer}
-            />
-          ),
-        });
-        // toastify(
-        //   <ChatMessage message={msg.message} user={peer.nickname} peer={peer} />
-        // );
+        displayMesageToast(msg.message, peer.nickname, peer);
       }
 
       if (msg.type === 'sending') {
@@ -192,9 +198,16 @@ export const Home = () => {
     });
     console.log('peer before sending', peer);
   };
-  const [chatMessage, setChatMessage] = useState('');
-  const sendMessage = peer => {
+
+  const sendMessage = (peer, chatMessage) => {
     p2pt.send(peer, { type: 'chat', message: chatMessage });
+    toast({
+      title: `Message sent to ${peer.nickname}`,
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+      position: 'top-right',
+    });
   };
   return (
     <Flex h="100vh" className="Home" direction="column" align="center">
@@ -209,9 +222,7 @@ export const Home = () => {
                 peer={item}
                 deviceInfo={item.device}
                 nickname={item.nickname}
-                chatMessage={chatMessage}
                 sendMessage={sendMessage}
-                setChatMessage={setChatMessage}
               />
             );
           })

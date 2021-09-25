@@ -8,6 +8,7 @@ import {
   InputLeftElement,
   InputRightElement,
 } from '@chakra-ui/react';
+import { useState } from 'react';
 import { RiComputerLine } from 'react-icons/ri';
 import { GiSmartphone } from 'react-icons/gi';
 import { IoMdText } from 'react-icons/io';
@@ -33,14 +34,8 @@ const determineDeviceIcon = deviceType => {
   }
 };
 
-export const Device = ({
-  deviceInfo,
-  nickname,
-  sendMessage,
-  chatMessage,
-  setChatMessage,
-  peer,
-}) => {
+export const Device = ({ deviceInfo, nickname, sendMessage, peer }) => {
+  const [chatMessage, setChatMessage] = useState('');
   const determineBrowserIcon = browser => {
     if (browser.toLowerCase().includes('chrome')) {
       return FaChrome;
@@ -97,13 +92,17 @@ export const Device = ({
             width="100%"
             size="lg"
             onChange={e => setChatMessage(e.target.value)}
+            value={chatMessage}
           />
           <Icon
             as={MdSend}
             w={10}
             h={10}
             mx={3}
-            onClick={() => sendMessage(peer)}
+            onClick={() => {
+              sendMessage(peer, chatMessage);
+              setChatMessage('');
+            }}
           />
         </Flex>
       </Flex>
