@@ -10,6 +10,7 @@ import {
   Flex,
   Image,
   Heading,
+  useToast,
 } from '@chakra-ui/react';
 import { useState, useRef, useEffect } from 'react';
 import SimplePeerFiles from 'simple-peer-files';
@@ -21,9 +22,11 @@ import {
   colors,
   animals,
 } from 'unique-names-generator';
+
 import logo from '../assets/logo.png';
 import './Home.css';
 import { Device } from '../components/Device';
+import { ChatMessage } from '../components/ChatMessage';
 const customConfig = {
   dictionaries: [adjectives, animals],
   separator: ' ',
@@ -53,6 +56,7 @@ export const Home = () => {
   const [connectedPeers, setConnectedPeers] = useState([]);
   const [filetoSend, setFile] = useState();
   const [fileName, setFileName] = useState('');
+  const toast = useToast();
   const spf = new SimplePeerFiles();
   const addNewPeer = peer => {
     peer.localAddress !== undefined
@@ -77,6 +81,7 @@ export const Home = () => {
       addNewPeer(peer);
     });
     p2pt.start();
+    //p2pt.requestMorePeers();
     const done = file => {
       console.log('done');
       if (file) {
@@ -134,14 +139,29 @@ export const Home = () => {
       //console.log(data);
     });
     p2pt.on('msg', async (peer, msg) => {
-      console.log('peer in msg', peer);
-      console.log('msgfileid', msg);
-
       if (msg.type === 'device-info') {
         console.log('got the device info', msg.device);
         peer.nickname = msg.nickname;
         peer.device = msg.device;
         setConnectedPeers(prevPeers => [...prevPeers, peer]);
+      }
+      if (msg.type === 'chat') {
+        console.log('got the chat message', msg.message);
+        toast({
+          position: 'top-right',
+          status: 'warning',
+          isClosable: true,
+          render: () => (
+            <ChatMessage
+              message={msg.message}
+              user={peer.nickname}
+              peer={peer}
+            />
+          ),
+        });
+        // toastify(
+        //   <ChatMessage message={msg.message} user={peer.nickname} peer={peer} />
+        // );
       }
 
       if (msg.type === 'sending') {
@@ -172,14 +192,12 @@ export const Home = () => {
     });
     console.log('peer before sending', peer);
   };
+  const [chatMessage, setChatMessage] = useState('');
+  const sendMessage = peer => {
+    p2pt.send(peer, { type: 'chat', message: chatMessage });
+  };
   return (
-    <Flex
-      backgroundColor="#00B4D8"
-      h="100vh"
-      className="Home"
-      direction="column"
-      align="center"
-    >
+    <Flex h="100vh" className="Home" direction="column" align="center">
       <Image boxSize="150px" objectFit="cover" src={logo} alt="Segun Adebayo" />
       <Flex direction="column" align="center">
         <h2>Your nickname: {userInfo.nickname}</h2>
@@ -188,8 +206,12 @@ export const Home = () => {
             return (
               <Device
                 key={index}
+                peer={item}
                 deviceInfo={item.device}
                 nickname={item.nickname}
+                chatMessage={chatMessage}
+                sendMessage={sendMessage}
+                setChatMessage={setChatMessage}
               />
             );
           })

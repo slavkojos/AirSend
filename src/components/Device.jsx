@@ -1,6 +1,16 @@
-import { Box, Flex, Heading, Icon } from '@chakra-ui/react';
+import {
+  Box,
+  Flex,
+  Heading,
+  Icon,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
+} from '@chakra-ui/react';
 import { RiComputerLine } from 'react-icons/ri';
 import { GiSmartphone } from 'react-icons/gi';
+import { IoMdText } from 'react-icons/io';
 import {
   FaOpera,
   FaChrome,
@@ -9,6 +19,7 @@ import {
   FaSafari,
   FaUser,
 } from 'react-icons/fa';
+import { MdSend } from 'react-icons/md';
 import './Device.css';
 import { DeviceDetail } from './DeviceDetail';
 const determineDeviceIcon = deviceType => {
@@ -22,9 +33,15 @@ const determineDeviceIcon = deviceType => {
   }
 };
 
-export const Device = ({ deviceInfo, nickname }) => {
+export const Device = ({
+  deviceInfo,
+  nickname,
+  sendMessage,
+  chatMessage,
+  setChatMessage,
+  peer,
+}) => {
   const determineBrowserIcon = browser => {
-    console.log(browser);
     if (browser.toLowerCase().includes('chrome')) {
       return FaChrome;
     } else if (browser.toLowerCase().includes('opera')) {
@@ -40,14 +57,6 @@ export const Device = ({ deviceInfo, nickname }) => {
     }
   };
   const determineDevice = device => {
-    // switch (device) {
-    //   case 'desktop':
-    //     return deviceInfo.os.name + ' ' + deviceInfo.os.version;
-    //   case 'smartphone':
-    //     return deviceInfo.device.brand + ' ' + deviceInfo.device.model;
-    //   default:
-    //     return 'Unknown';
-    // }
     if (device === 'desktop' && deviceInfo.os.name !== '') {
       return deviceInfo.os.name + ' ' + deviceInfo.os.version;
     } else if (device === 'smartphone' && deviceInfo.device.brand !== '') {
@@ -62,9 +71,9 @@ export const Device = ({ deviceInfo, nickname }) => {
       justifyContent="space-between"
       align="center"
       py={4}
-      px={6}
+      px={4}
       borderRadius="30px"
-      h="200px"
+      h="250px"
       my={2}
       cursor="pointer"
       width="350px"
@@ -79,6 +88,24 @@ export const Device = ({ deviceInfo, nickname }) => {
           icon={determineBrowserIcon(deviceInfo.client.name)}
           info={deviceInfo.client.name + ' ' + deviceInfo.client.version}
         />
+        <Flex align="center" my={2} justify="space-between">
+          <Icon as={IoMdText} w={10} h={10} mr={3} />
+          <Input
+            variant="flushed"
+            placeholder="Send your message here"
+            _placeholder={{ color: 'black' }}
+            width="100%"
+            size="lg"
+            onChange={e => setChatMessage(e.target.value)}
+          />
+          <Icon
+            as={MdSend}
+            w={10}
+            h={10}
+            mx={3}
+            onClick={() => sendMessage(peer)}
+          />
+        </Flex>
       </Flex>
     </Flex>
   );

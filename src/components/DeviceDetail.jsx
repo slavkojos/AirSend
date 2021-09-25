@@ -12,8 +12,8 @@ import {
 
 export const DeviceDetail = ({ icon, info }) => {
   return (
-    <Flex my={1} align="center" maxWidth="300px">
-      <Icon as={icon} w={12} h={12} mr={3} />
+    <Flex my={2} align="center" maxWidth="300px">
+      <Icon as={icon} w={10} h={10} mr={3} />
       <Heading size="lg" isTruncated fontWeight="normal">
         {info}
       </Heading>
