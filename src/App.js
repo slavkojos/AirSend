@@ -7,12 +7,12 @@ import {
   VStack,
   Code,
   Grid,
-  theme,
   Flex,
 } from '@chakra-ui/react';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { Logo } from './Logo';
 import { Home } from './pages/Home';
+import theme from './theme';
 
 function App() {
   return (

@@ -24,6 +24,7 @@ import {
 } from 'unique-names-generator';
 
 import logo from '../assets/logo.png';
+import logo_light from '../assets/logo_light.png';
 import './Home.css';
 import { Device } from '../components/Device';
 import { ChatMessage } from '../components/ChatMessage';
@@ -54,10 +55,8 @@ console.log('My peer id : ' + p2pt._peerId);
 
 export const Home = () => {
   const [connectedPeers, setConnectedPeers] = useState([]);
-  const [filetoSend, setFile] = useState();
-  const [fileName, setFileName] = useState('');
   const toast = useToast();
-  const toastIdRef = useRef();
+  const inputFile = useRef();
 
   const spf = new SimplePeerFiles();
   const addNewPeer = peer => {
@@ -110,7 +109,7 @@ export const Home = () => {
       console.log(tracker);
       console.log('connected to p2p network');
     });
-    const prepareToRecieve = peer => {
+    const prepareToRecieve = (peer, fileName) => {
       //console.log("peerid in recieve", peer.id);
       console.log('peer in spf recieve', peer);
       spf.receive(peer, 'myFileID').then(transfer => {
@@ -129,10 +128,11 @@ export const Home = () => {
     };
     const startFileTransfer = peer => {
       //console.log("peerid in send", peer.id);
-      console.log('filetorsend', filetoSend);
       console.log('peer in spf send', peer);
       spf.send(peer, 'myFileID', inputFile.current.files[0]).then(transfer => {
-        transfer.on('progress', console.log);
+        transfer.on('progress', progress => {
+          console.log(progress);
+        });
         transfer.on('cancelled', () => {
           console.log('cancelling');
         });
@@ -172,7 +172,14 @@ export const Home = () => {
 
       if (msg.type === 'sending') {
         console.log('preparing to send');
-        prepareToRecieve(peer); // peer should be initial sender peer
+        toast({
+          title: `${peer.nickname} is sending you file named ${msg.fileId}`,
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right',
+        });
+        prepareToRecieve(peer, msg.fileId); // peer should be initial sender peer
       }
 
       if (msg.type === 'ready') {
@@ -181,22 +188,16 @@ export const Home = () => {
       }
     });
   }, []);
-  const inputFile = useRef();
-  const clickFileUpload = () => {
-    inputFile.current.click();
-  };
 
-  const handleUploadFile = peer => {
+  const handleUploadFile = (peer, file) => {
     console.log('sendingggggggg');
-    console.log(fileName);
-    const file = filetoSend;
     console.log(file);
 
     p2pt.send(peer, {
       type: 'sending',
-      fileId: fileName,
+      fileId: file.name,
+      fileSize: file.size,
     });
-    console.log('peer before sending', peer);
   };
 
   const sendMessage = (peer, chatMessage) => {
@@ -210,8 +211,19 @@ export const Home = () => {
     });
   };
   return (
-    <Flex h="100vh" className="Home" direction="column" align="center">
-      <Image boxSize="150px" objectFit="cover" src={logo} alt="Segun Adebayo" />
+    <Flex
+      h="100vh"
+      className="Home"
+      direction="column"
+      align="center"
+      color="gray.300"
+    >
+      <Image
+        boxSize="150px"
+        objectFit="cover"
+        src={logo_light}
+        alt="Segun Adebayo"
+      />
       <Flex direction="column" align="center">
         <h2>Your nickname: {userInfo.nickname}</h2>
         {connectedPeers.length > 0 ? (
@@ -223,6 +235,8 @@ export const Home = () => {
                 deviceInfo={item.device}
                 nickname={item.nickname}
                 sendMessage={sendMessage}
+                inputFile={inputFile}
+                handleUploadFile={handleUploadFile}
               />
             );
           })

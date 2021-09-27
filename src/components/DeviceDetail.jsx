@@ -10,11 +10,11 @@ import {
   FaUser,
 } from 'react-icons/fa';
 
-export const DeviceDetail = ({ icon, info }) => {
+export const DeviceDetail = ({ icon, info, fontSize, maxWidth }) => {
   return (
-    <Flex my={2} align="center" maxWidth="300px">
-      <Icon as={icon} w={10} h={10} mr={3} />
-      <Heading size="lg" isTruncated fontWeight="normal">
+    <Flex my={2} align="center" maxWidth={maxWidth}>
+      <Icon as={icon} w={10} h={10} mr={2} />
+      <Heading size={fontSize} isTruncated fontWeight="normal">
         {info}
       </Heading>
     </Flex>

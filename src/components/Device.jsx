@@ -7,8 +7,9 @@ import {
   InputGroup,
   InputLeftElement,
   InputRightElement,
+  Button,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { RiComputerLine } from 'react-icons/ri';
 import { GiSmartphone } from 'react-icons/gi';
 import { IoMdText } from 'react-icons/io';
@@ -34,8 +35,16 @@ const determineDeviceIcon = deviceType => {
   }
 };
 
-export const Device = ({ deviceInfo, nickname, sendMessage, peer }) => {
+export const Device = ({
+  deviceInfo,
+  nickname,
+  sendMessage,
+  peer,
+  handleUploadFile,
+  inputFile,
+}) => {
   const [chatMessage, setChatMessage] = useState('');
+
   const determineBrowserIcon = browser => {
     if (browser.toLowerCase().includes('chrome')) {
       return FaChrome;
@@ -60,39 +69,58 @@ export const Device = ({ deviceInfo, nickname, sendMessage, peer }) => {
       return 'Unknown';
     }
   };
+
   return (
     <Flex
-      bg="#fca311"
+      className="device"
       justifyContent="space-between"
       align="center"
       py={4}
       px={4}
       borderRadius="30px"
-      h="250px"
+      maxHeight="250px"
       my={2}
       cursor="pointer"
-      width="350px"
+      maxWidth="450px"
     >
       <Flex direction="column">
-        <DeviceDetail icon={FaUser} info={nickname} />
         <DeviceDetail
-          icon={determineDeviceIcon(deviceInfo.device.type)}
-          info={determineDevice(deviceInfo.device.type)}
+          icon={FaUser}
+          info={nickname}
+          fontSize="lg"
+          maxWidth="450px"
         />
-        <DeviceDetail
-          icon={determineBrowserIcon(deviceInfo.client.name)}
-          info={deviceInfo.client.name + ' ' + deviceInfo.client.version}
-        />
+        <Flex justify="space-between" align="center">
+          <DeviceDetail
+            maxWidth="150px"
+            fontSize="xs"
+            icon={determineDeviceIcon(deviceInfo.device.type)}
+            info={determineDevice(deviceInfo.device.type)}
+          />
+          <DeviceDetail
+            maxWidth="150px"
+            fontSize="xs"
+            icon={determineBrowserIcon(deviceInfo.client.name)}
+            info={deviceInfo.client.name + ' ' + deviceInfo.client.version}
+          />
+        </Flex>
+
         <Flex align="center" my={2} justify="space-between">
           <Icon as={IoMdText} w={10} h={10} mr={3} />
           <Input
             variant="flushed"
             placeholder="Send your message here"
-            _placeholder={{ color: 'black' }}
+            _placeholder={{ color: 'gray.300' }}
             width="100%"
             size="lg"
             onChange={e => setChatMessage(e.target.value)}
             value={chatMessage}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && e.target.value !== '') {
+                sendMessage(peer, chatMessage);
+                setChatMessage('');
+              }
+            }}
           />
           <Icon
             as={MdSend}
@@ -105,6 +133,22 @@ export const Device = ({ deviceInfo, nickname, sendMessage, peer }) => {
             }}
           />
         </Flex>
+        <Input
+          type="file"
+          style={{ display: 'none' }}
+          ref={inputFile}
+          onChange={e => {
+            handleUploadFile(peer, e.target.files[0]);
+          }}
+        />
+        <Button
+          my={2}
+          colorScheme="blue"
+          size="md"
+          onClick={() => inputFile.current.click()}
+        >
+          Click here to send a file
+        </Button>
       </Flex>
     </Flex>
   );
