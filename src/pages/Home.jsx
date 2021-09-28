@@ -141,7 +141,10 @@ export const Home = () => {
             },
           });
         });
-        transfer.on('done', done);
+        transfer.on('done', file => {
+          done(file);
+          toast.close(toastProgressId);
+        });
         transfer.on('cancelled', () => {
           console.log('cancelling');
         });
@@ -205,6 +208,7 @@ export const Home = () => {
         });
         transfer.on('done', () => {
           console.log('successfuly sent the file');
+          toast.close(toastProgressId);
           //p2pt.destroy();
         });
         transfer.start();
