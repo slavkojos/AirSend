@@ -15,18 +15,24 @@ import {
   Icon,
   CloseButton,
   useClipboard,
+  Progress,
 } from '@chakra-ui/react';
 import { FaCheck } from 'react-icons/fa';
 import { MdCancel } from 'react-icons/md';
+import { useState } from 'react';
 
-export const FileAcceptPrompt = ({
+export const FileProgress = ({
   fileName,
   fileSize,
   user,
   peer,
   close,
   prepareToRecieve,
+  progress,
+  toastProgressId,
 }) => {
+  console.log('progress in fileprogress: ' + progress);
+  console.log('toastProgressId in fileprogress: ' + toastProgressId);
   return (
     <Flex
       maxHeight="300px"
@@ -41,27 +47,27 @@ export const FileAcceptPrompt = ({
     >
       <Flex direction="column">
         <Text>
-          {user} is trying to send you file named {fileName},{fileSize}
+          {fileName},{fileSize}
         </Text>
-        <Flex justify="space-between" align="center" my={1}>
-          <Button
-            leftIcon={<FaCheck />}
+        <Flex my={1} direction="column" justify="flex-start" align="flex-start">
+          <Progress
             colorScheme="green"
-            variant="solid"
-            onClick={() => {
-              prepareToRecieve(peer, fileName, fileSize);
-              close();
-            }}
-          >
-            Accept
-          </Button>
+            height="16px"
+            value={Math.round(progress)}
+            width="80%"
+            max={100}
+            min={0}
+            mr={3}
+            borderRadius="md"
+          />
+          <Text>{Math.round(progress)}%</Text>
           <Button
             leftIcon={<MdCancel />}
             colorScheme="red"
             variant="solid"
             onClick={close}
           >
-            Reject
+            Cancel transfer
           </Button>
         </Flex>
       </Flex>
