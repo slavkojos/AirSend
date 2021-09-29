@@ -20,6 +20,7 @@ import {
 import { FaCheck } from 'react-icons/fa';
 import { MdCancel } from 'react-icons/md';
 import { useState } from 'react';
+import { IoIosSpeedometer } from 'react-icons/io';
 
 export const FileProgress = ({
   fileName,
@@ -30,6 +31,7 @@ export const FileProgress = ({
   prepareToRecieve,
   progress,
   toastProgressId,
+  transferSpeed,
 }) => {
   console.log('progress in fileprogress: ' + progress);
   console.log('toastProgressId in fileprogress: ' + toastProgressId);
@@ -61,14 +63,23 @@ export const FileProgress = ({
             borderRadius="md"
           />
           <Text>{Math.round(progress)}%</Text>
-          <Button
-            leftIcon={<MdCancel />}
-            colorScheme="red"
-            variant="solid"
-            onClick={close}
-          >
-            Cancel transfer
-          </Button>
+          <Flex>
+            <Button
+              leftIcon={IoIosSpeedometer}
+              colorScheme="teal"
+              variant="solid"
+            >
+              {(transferSpeed / 1048576).toFixed(2)} MB/s
+            </Button>
+            <Button
+              leftIcon={<MdCancel />}
+              colorScheme="red"
+              variant="solid"
+              onClick={close}
+            >
+              Cancel transfer
+            </Button>
+          </Flex>
         </Flex>
       </Flex>
       <CloseButton fontSize="12px" onClick={close} />

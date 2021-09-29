@@ -57,10 +57,10 @@ console.log('My peer id : ' + p2pt._peerId);
 
 export const Home = () => {
   const [connectedPeers, setConnectedPeers] = useState([]);
-  //const [fileProgress, setFileProgress] = useState(null);
   const toast = useToast();
   const inputFile = useRef();
   let fileProgress = useRef();
+  let transferSpeed = useRef();
 
   const spf = new SimplePeerFiles();
   const addNewPeer = peer => {
@@ -69,7 +69,6 @@ export const Home = () => {
       : (peer.ip = peer.remoteAddress);
     if (peer.ip !== undefined) {
       if (is_ip_private(peer.ip)) {
-        //device.device.model = p2pt._peerId;
         p2pt.send(peer, {
           type: 'device-info',
           device: device,
@@ -113,6 +112,11 @@ export const Home = () => {
       console.log(tracker);
       console.log('connected to p2p network');
     });
+    let prevPercent = 0;
+    const calculateTransferSpeed = (percent, fileSize) => {
+      transferSpeed.current = ((percent - prevPercent) * fileSize) / 100;
+      prevPercent = percent;
+    };
     const prepareToRecieve = (peer, fileName, fileSize) => {
       //console.log("peerid in recieve", peer.id);
       console.log('peer in spf recieve', peer);
@@ -136,6 +140,7 @@ export const Home = () => {
                   prepareToRecieve={prepareToRecieve}
                   progress={fileProgress.current}
                   toastProgressId={id}
+                  transferSpeed={transferSpeed.current}
                 />
               );
             },
@@ -153,6 +158,10 @@ export const Home = () => {
         type: 'ready',
         fileId: fileName,
       });
+      setInterval(
+        () => calculateTransferSpeed(fileProgress.current, fileSize),
+        500
+      );
       toast({
         position: 'top-right',
         isClosable: true,
@@ -198,6 +207,7 @@ export const Home = () => {
                   prepareToRecieve={prepareToRecieve}
                   progress={fileProgress.current}
                   toastProgressId={id}
+                  transferSpeed={transferSpeed.current}
                 />
               );
             },
@@ -212,6 +222,14 @@ export const Home = () => {
           //p2pt.destroy();
         });
         transfer.start();
+        setInterval(
+          () =>
+            calculateTransferSpeed(
+              fileProgress.current,
+              inputFile.current.files[0].size
+            ),
+          1000
+        );
         toast({
           position: 'top-right',
           isClosable: true,
@@ -339,7 +357,7 @@ export const Home = () => {
             );
           })
         ) : (
-          <Heading size="lg" fontWeight="bold" my={3} w={'50%'}>
+          <Heading size="md" fontWeight="bold" my={3} maxWidth={'500px'}>
             Other devices should appear here, make sure you are using either
             Google Chrome, Opera or Microsoft Edge
           </Heading>

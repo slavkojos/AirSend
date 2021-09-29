@@ -81,7 +81,7 @@ export const Device = ({
       maxHeight="250px"
       my={2}
       cursor="pointer"
-      maxWidth="450px"
+      maxWidth="750px"
     >
       <Flex direction="column">
         <DeviceDetail
