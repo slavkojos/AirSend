@@ -147,6 +147,8 @@ export const Home = () => {
           });
         });
         transfer.on('done', file => {
+          clearInterval(speedTest);
+          prevPercent = 0;
           done(file);
           toast.close(toastProgressId);
         });
@@ -158,7 +160,7 @@ export const Home = () => {
         type: 'ready',
         fileId: fileName,
       });
-      setInterval(
+      let speedTest = setInterval(
         () => calculateTransferSpeed(fileProgress.current, fileSize),
         500
       );
@@ -219,10 +221,12 @@ export const Home = () => {
         transfer.on('done', () => {
           console.log('successfuly sent the file');
           toast.close(toastProgressId);
+          clearInterval(speedTest);
+          prevPercent = 0;
           //p2pt.destroy();
         });
         transfer.start();
-        setInterval(
+        let speedTest = setInterval(
           () =>
             calculateTransferSpeed(
               fileProgress.current,
