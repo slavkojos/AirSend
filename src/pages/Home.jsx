@@ -31,7 +31,6 @@ import { Device } from '../components/Device';
 import { ChatMessage } from '../components/ChatMessage';
 import { FileAcceptPrompt } from '../components/FileAcceptPrompt';
 import { FileProgress } from '../components/FileProgress';
-import { log } from 'debug';
 const customConfig = {
   dictionaries: [adjectives, animals],
   separator: ' ',
@@ -42,8 +41,6 @@ const deviceDetector = new DeviceDetector();
 const device = deviceDetector.parse(navigator.userAgent);
 const fileDownload = require('js-file-download');
 const P2PT = require('p2pt');
-const is_ip_private = require('private-ip');
-const publicIp = require('public-ip');
 // const trackersAnnounceURLs = [
 //   'wss://tracker.files.fm:7073/announce',
 //   'wss://spacetradersapi-chatbox.herokuapp.com:443/announce',
@@ -370,11 +367,11 @@ export const Home = () => {
   };
   return (
     <Flex
-      h="100vh"
       className="Home"
       direction="column"
       align="center"
       color="gray.300"
+      minHeight="100vh"
     >
       <Image
         boxSize="150px"
