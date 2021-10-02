@@ -31,6 +31,7 @@ import { Device } from '../components/Device';
 import { ChatMessage } from '../components/ChatMessage';
 import { FileAcceptPrompt } from '../components/FileAcceptPrompt';
 import { FileProgress } from '../components/FileProgress';
+import { log } from 'debug';
 const customConfig = {
   dictionaries: [adjectives, animals],
   separator: ' ',
@@ -72,9 +73,9 @@ export const Home = () => {
   let clientIp = useRef();
   const toastIdRef = useRef();
   const getPublicIp = async () => {
-    const response = await fetch('https://ip4.seeip.org/json');
+    const response = await fetch('https://api.bigdatacloud.net/data/client-ip');
     const data = await response.json();
-    clientIp.current = data.ip;
+    clientIp.current = data.ipString;
   };
   const spf = new SimplePeerFiles();
   const addNewPeer = peer => {
@@ -300,7 +301,7 @@ export const Home = () => {
         peer.ip = msg.ip;
         console.log('peer ip', msg.ip);
         console.log('client ip', clientIp);
-        if (peer.ip === clientIp.current && clientIp.current !== '') {
+        if (peer.ip === clientIp.current && clientIp.current !== undefined) {
           setConnectedPeers(prevPeers => [...prevPeers, peer]);
         } else {
           console.log('false');
