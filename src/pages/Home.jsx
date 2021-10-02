@@ -11,6 +11,7 @@ import {
   Image,
   Heading,
   useToast,
+  Avatar,
 } from '@chakra-ui/react';
 import { useState, useRef, useEffect } from 'react';
 import SimplePeerFiles from 'simple-peer-files';
@@ -41,6 +42,7 @@ const device = deviceDetector.parse(navigator.userAgent);
 const fileDownload = require('js-file-download');
 const P2PT = require('p2pt');
 const is_ip_private = require('private-ip');
+const publicIp = require('public-ip');
 const trackersAnnounceURLs = [
   'wss://tracker.files.fm:7073/announce',
   'wss://spacetradersapi-chatbox.herokuapp.com:443/announce',
@@ -48,7 +50,7 @@ const trackersAnnounceURLs = [
   'wss://tracker.btorrent.xyz',
   'wss://peertube.cpy.re:443/tracker/socket',
 ];
-const p2pt = new P2PT(trackersAnnounceURLs, 'localdev123');
+const p2pt = new P2PT(trackersAnnounceURLs, 'local-air-send');
 let userInfo = {
   id: p2pt._peerId,
   nickname: uniqueNamesGenerator(customConfig),
@@ -57,25 +59,39 @@ console.log('My peer id : ' + p2pt._peerId);
 
 export const Home = () => {
   const [connectedPeers, setConnectedPeers] = useState([]);
+
   const toast = useToast();
   const inputFile = useRef();
   let fileProgress = useRef();
   let transferSpeed = useRef();
-
+  let clientIp = useRef();
+  const toastIdRef = useRef();
+  const getPublicIp = async () => {
+    const response = await fetch('https://api.ipify.org/?format=json');
+    const data = await response.json();
+    clientIp.current = data.ip;
+  };
   const spf = new SimplePeerFiles();
   const addNewPeer = peer => {
-    peer.localAddress !== undefined
-      ? (peer.ip = peer.localAddress)
-      : (peer.ip = peer.remoteAddress);
-    if (peer.ip !== undefined) {
-      if (is_ip_private(peer.ip)) {
-        p2pt.send(peer, {
-          type: 'device-info',
-          device: device,
-          nickname: userInfo.nickname,
-        });
-      }
-    }
+    // peer.localAddress !== undefined
+    //   ? (peer.ip = peer.localAddress)
+    //   : (peer.ip = peer.remoteAddress);
+    // if (peer.ip !== undefined) {
+    //   if (is_ip_private(peer.ip)) {
+    //     p2pt.send(peer, {
+    //       type: 'device-info',
+    //       device: device,
+    //       nickname: userInfo.nickname,
+    //     });
+    //   }
+    // }
+    console.log('clientip', clientIp.current);
+    p2pt.send(peer, {
+      type: 'device-info',
+      device: device,
+      nickname: userInfo.nickname,
+      ip: clientIp.current,
+    });
     //setConnectedPeers(prevPeers => [...prevPeers, peer]);
   };
   const displayMesageToast = (message, nickname, peer) => {
@@ -94,6 +110,7 @@ export const Home = () => {
     });
   };
   useEffect(() => {
+    getPublicIp();
     p2pt.on('peerconnect', peer => {
       console.log('peer remote address', peer);
       console.log(`New peer connected with id: ${peer.id}`);
@@ -275,7 +292,14 @@ export const Home = () => {
         console.log('got the device info', msg.device);
         peer.nickname = msg.nickname;
         peer.device = msg.device;
-        setConnectedPeers(prevPeers => [...prevPeers, peer]);
+        peer.ip = msg.ip;
+        console.log('peer ip', msg.ip);
+        console.log('client ip', clientIp);
+        if (peer.ip === clientIp.current && clientIp.current !== '') {
+          setConnectedPeers(prevPeers => [...prevPeers, peer]);
+        } else {
+          console.log('false');
+        }
       }
 
       if (msg.type === 'chat') {
@@ -304,6 +328,7 @@ export const Home = () => {
 
       if (msg.type === 'ready') {
         console.log('got the message that reciever is ready');
+        toast.close(toastIdRef.current);
         startFileTransfer(peer);
       }
     });
@@ -317,6 +342,13 @@ export const Home = () => {
       type: 'sending',
       fileId: file.name,
       fileSize: file.size,
+    });
+    toastIdRef.current = toast({
+      title: `Waiting for ${peer.nickname} to accept the file`,
+      status: 'warning',
+      duration: null,
+      isClosable: false,
+      position: 'top-right',
     });
   };
 
@@ -345,7 +377,22 @@ export const Home = () => {
         alt="Segun Adebayo"
       />
       <Flex direction="column" align="center">
-        <h2>Your nickname: {userInfo.nickname}</h2>
+        <Flex
+          direction="column"
+          align="center"
+          justify="center"
+          bg="teal"
+          borderRadius="2xl"
+          p={2}
+          px={4}
+        >
+          <Avatar
+            h={24}
+            w={24}
+            src={`https://avatars.dicebear.com/api/avataaars/${userInfo.id}.svg`}
+          />
+          <Text>Your name: {userInfo.nickname}</Text>
+        </Flex>
         {connectedPeers.length > 0 ? (
           connectedPeers.map((item, index) => {
             return (
@@ -362,8 +409,7 @@ export const Home = () => {
           })
         ) : (
           <Heading size="md" fontWeight="bold" my={3} maxWidth={'500px'}>
-            Other devices should appear here, make sure you are using either
-            Google Chrome, Opera or Microsoft Edge
+            Devices on your network should appear here soon
           </Heading>
         )}
       </Flex>

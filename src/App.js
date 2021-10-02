@@ -17,7 +17,7 @@ import theme from './theme';
 function App() {
   return (
     <ChakraProvider theme={theme}>
-      <Box textAlign="center" fontSize="xl">
+      <Box textAlign="center" fontSize="xl" h="100%">
         <Flex direction="column">
           <Home />
         </Flex>

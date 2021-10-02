@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, Icon } from '@chakra-ui/react';
+import { Box, Flex, Heading, Icon, Avatar } from '@chakra-ui/react';
 import { RiComputerLine } from 'react-icons/ri';
 import { GiSmartphone } from 'react-icons/gi';
 import {
@@ -13,7 +13,12 @@ import {
 export const DeviceDetail = ({ icon, info, fontSize, maxWidth }) => {
   return (
     <Flex my={2} align="center" maxWidth={maxWidth}>
-      <Icon as={icon} w={10} h={10} mr={2} />
+      {fontSize === 'lg' ? (
+        <Avatar src={icon} w={14} h={14} mr={2} />
+      ) : (
+        <Icon as={icon} w={10} h={10} mr={2} />
+      )}
+
       <Heading size={fontSize} isTruncated fontWeight="normal">
         {info}
       </Heading>

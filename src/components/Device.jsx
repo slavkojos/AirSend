@@ -77,15 +77,15 @@ export const Device = ({
       align="center"
       py={4}
       px={4}
-      borderRadius="30px"
-      maxHeight="250px"
+      borderRadius="2xl"
       my={2}
       cursor="pointer"
-      maxWidth="750px"
+      maxWidth="800px"
+      maxHeight="300px"
     >
-      <Flex direction="column">
+      <Flex direction="column" align="stretch">
         <DeviceDetail
-          icon={FaUser}
+          icon={`https://avatars.dicebear.com/api/avataaars/${peer.id}.svg`}
           info={nickname}
           fontSize="lg"
           maxWidth="450px"
