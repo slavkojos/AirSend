@@ -72,7 +72,7 @@ export const Home = () => {
   let clientIp = useRef();
   const toastIdRef = useRef();
   const getPublicIp = async () => {
-    const response = await fetch('https://api.ipify.org/?format=json');
+    const response = await fetch('https://ip4.seeip.org/json');
     const data = await response.json();
     clientIp.current = data.ip;
   };
