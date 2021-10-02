@@ -43,12 +43,17 @@ const fileDownload = require('js-file-download');
 const P2PT = require('p2pt');
 const is_ip_private = require('private-ip');
 const publicIp = require('public-ip');
+// const trackersAnnounceURLs = [
+//   'wss://tracker.files.fm:7073/announce',
+//   'wss://spacetradersapi-chatbox.herokuapp.com:443/announce',
+//   'wss://tracker.openwebtorrent.com',
+//   'wss://tracker.btorrent.xyz',
+//   'wss://peertube.cpy.re:443/tracker/socket',
+// ];
+
 const trackersAnnounceURLs = [
-  'wss://tracker.files.fm:7073/announce',
   'wss://spacetradersapi-chatbox.herokuapp.com:443/announce',
   'wss://tracker.openwebtorrent.com',
-  'wss://tracker.btorrent.xyz',
-  'wss://peertube.cpy.re:443/tracker/socket',
 ];
 const p2pt = new P2PT(trackersAnnounceURLs, 'local-air-send');
 let userInfo = {
