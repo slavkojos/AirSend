@@ -23,7 +23,7 @@ import {
   colors,
   animals,
 } from 'unique-names-generator';
-
+import NET from 'vanta/dist/vanta.net.min';
 import logo from '../assets/logo.png';
 import logo_light from '../assets/logo_light.png';
 import './Home.css';
@@ -69,6 +69,9 @@ export const Home = () => {
   let transferSpeed = useRef();
   let clientIp = useRef();
   const toastIdRef = useRef();
+
+  const [vantaEffect, setVantaEffect] = useState(0);
+  const vantaRef = useRef(null);
   const getPublicIp = async () => {
     const response = await fetch('https://api.bigdatacloud.net/data/client-ip');
     const data = await response.json();
@@ -113,6 +116,22 @@ export const Home = () => {
     });
   };
   useEffect(() => {
+    if (!vantaEffect) {
+      setVantaEffect(
+        NET({
+          el: vantaRef.current,
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200.0,
+          minWidth: 200.0,
+          scale: 1.0,
+          scaleMobile: 1.0,
+          color: 0x3fc6ff,
+          maxDistance: 22.0,
+        })
+      );
+    }
     getPublicIp();
     p2pt.on('peerconnect', peer => {
       console.log('peer remote address', peer);
@@ -372,6 +391,7 @@ export const Home = () => {
       align="center"
       color="gray.300"
       minHeight="100vh"
+      ref={vantaRef}
     >
       <Image
         boxSize="150px"
@@ -384,10 +404,10 @@ export const Home = () => {
           direction="column"
           align="center"
           justify="center"
-          bg="teal"
           borderRadius="2xl"
           p={2}
           px={4}
+          className="user"
         >
           <Avatar
             h={24}
