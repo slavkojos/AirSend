@@ -65,7 +65,7 @@ export const FileProgress = ({
           <Text>{Math.round(progress)}%</Text>
           <Flex>
             <Button
-              leftIcon={IoIosSpeedometer}
+              leftIcon={<IoIosSpeedometer />}
               colorScheme="teal"
               variant="solid"
             >

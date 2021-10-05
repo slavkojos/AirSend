@@ -8,6 +8,7 @@ import {
   InputLeftElement,
   InputRightElement,
   Button,
+  IconButton,
 } from '@chakra-ui/react';
 import { useState, useRef } from 'react';
 import { RiComputerLine } from 'react-icons/ri';
@@ -73,32 +74,31 @@ export const Device = ({
   return (
     <Flex
       className="device"
-      justifyContent="space-between"
-      align="center"
       py={4}
       px={4}
       borderRadius="2xl"
       my={2}
       cursor="pointer"
-      maxWidth="800px"
+      minWidth="320px"
+      maxWidth="750px"
       maxHeight="300px"
     >
-      <Flex direction="column" align="stretch">
+      <Flex direction="column" justify="space-between" width="100%">
         <DeviceDetail
-          icon={`https://avatars.dicebear.com/api/avataaars/${peer.id}.svg`}
+          maxWidth="100%"
+          icon={`https://avatars.dicebear.com/api/personas/${peer.id}.svg`}
           info={nickname}
           fontSize="lg"
-          maxWidth="450px"
         />
         <Flex justify="space-between" align="center">
           <DeviceDetail
-            maxWidth="150px"
+            maxWidth="75%"
             fontSize="xs"
             icon={determineDeviceIcon(deviceInfo.device.type)}
             info={determineDevice(deviceInfo.device.type)}
           />
           <DeviceDetail
-            maxWidth="150px"
+            maxWidth="75%"
             fontSize="xs"
             icon={determineBrowserIcon(deviceInfo.client.name)}
             info={deviceInfo.client.name + ' ' + deviceInfo.client.version}
@@ -122,10 +122,11 @@ export const Device = ({
               }
             }}
           />
-          <Icon
-            as={MdSend}
-            w={10}
-            h={10}
+          <IconButton
+            icon={<MdSend />}
+            variant="outline"
+            colorScheme="cyan"
+            fontSize="20px"
             mx={3}
             onClick={() => {
               sendMessage(peer, chatMessage);

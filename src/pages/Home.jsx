@@ -12,8 +12,11 @@ import {
   Heading,
   useToast,
   Avatar,
+  SimpleGrid,
+  Button,
+  useDisclosure,
 } from '@chakra-ui/react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import SimplePeerFiles from 'simple-peer-files';
 import DeviceDetector from 'device-detector-js';
 import {
@@ -31,6 +34,8 @@ import { Device } from '../components/Device';
 import { ChatMessage } from '../components/ChatMessage';
 import { FileAcceptPrompt } from '../components/FileAcceptPrompt';
 import { FileProgress } from '../components/FileProgress';
+import { ChangeRoomModal } from '../components/ChangeRoomModal';
+import { ImEnter } from 'react-icons/im';
 const customConfig = {
   dictionaries: [adjectives, animals],
   separator: ' ',
@@ -53,16 +58,22 @@ const trackersAnnounceURLs = [
   'wss://spacetradersapi-chatbox.herokuapp.com:443/announce',
   'wss://tracker.openwebtorrent.com',
 ];
-const p2pt = new P2PT(trackersAnnounceURLs, 'local-air-send');
+
+const p2pt = new P2PT(trackersAnnounceURLs, 'air-send-local');
 let userInfo = {
   id: p2pt._peerId,
   nickname: uniqueNamesGenerator(customConfig),
 };
-console.log('My peer id : ' + p2pt._peerId);
+export const Home = ({ match }) => {
+  let identifer = 'air-send-local';
+  match.params.id === undefined
+    ? (identifer = 'air-send-local')
+    : (identifer = match.params.id);
 
-export const Home = () => {
+  console.log('My peer id : ' + p2pt._peerId, identifer);
   const [connectedPeers, setConnectedPeers] = useState([]);
-
+  const [roomNumber, setRoomNumber] = useState('');
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const inputFile = useRef();
   let fileProgress = useRef();
@@ -115,19 +126,35 @@ export const Home = () => {
       ),
     });
   };
+  useCallback(() => {
+    if (match.params.id !== undefined) {
+      p2pt.destroy();
+      setConnectedPeers([]);
+      console.log('changing');
+      p2pt.setIdentifier(`air-send-${match.params.id}`);
+    } else {
+      p2pt.destroy();
+      setConnectedPeers([]);
+      console.log('on local');
+    }
+  }, [match.params.id]);
   useEffect(() => {
+    console.log('useeffect called');
+
     if (!vantaEffect) {
       setVantaEffect(
         NET({
           el: vantaRef.current,
           mouseControls: true,
           touchControls: true,
-          gyroControls: false,
+          gyroControls: true,
           minHeight: 200.0,
           minWidth: 200.0,
           scale: 1.0,
-          scaleMobile: 1.0,
+          scaleMobile: 2.0,
           color: 0x3fc6ff,
+          points: 6.0,
+          spacing: 18.0,
           maxDistance: 22.0,
         })
       );
@@ -138,7 +165,17 @@ export const Home = () => {
       console.log(`New peer connected with id: ${peer.id}`);
       addNewPeer(peer);
     });
-    p2pt.start();
+
+    // if (match.params.id !== undefined) {
+    //   setConnectedPeers([]);
+    //   console.log('changing the identifer');
+    //   p2pt.setIdentifier(`air-send-${match.params.id}`);
+    //   p2pt.start();
+    // } else {
+    //   setConnectedPeers([]);
+    //   p2pt.setIdentifier(`air-send-local`);
+    //   p2pt.start();
+    // }
     //p2pt.requestMorePeers();
     const done = file => {
       console.log('done');
@@ -317,10 +354,13 @@ export const Home = () => {
         peer.ip = msg.ip;
         console.log('peer ip', msg.ip);
         console.log('client ip', clientIp);
-        if (peer.ip === clientIp.current && clientIp.current !== undefined) {
+        if (match.params.id !== undefined) {
           setConnectedPeers(prevPeers => [...prevPeers, peer]);
-        } else {
-          console.log('false');
+        } else if (
+          peer.ip === clientIp.current &&
+          clientIp.current !== undefined
+        ) {
+          setConnectedPeers(prevPeers => [...prevPeers, peer]);
         }
       }
 
@@ -354,6 +394,11 @@ export const Home = () => {
         startFileTransfer(peer);
       }
     });
+    p2pt.start();
+    return () => {
+      if (vantaEffect) vantaEffect.destroy();
+      if (p2pt) p2pt.destroy();
+    };
   }, []);
 
   const handleUploadFile = (peer, file) => {
@@ -412,9 +457,34 @@ export const Home = () => {
           <Avatar
             h={24}
             w={24}
-            src={`https://avatars.dicebear.com/api/avataaars/${userInfo.id}.svg`}
+            src={`https://avatars.dicebear.com/api/personas/${userInfo.id}.svg`}
           />
-          <Text>Your name: {userInfo.nickname}</Text>
+          <Text fontSize="xl" fontWeight="bold">
+            Your name: {userInfo.nickname}
+          </Text>
+          {match.params.id === undefined ? (
+            <>
+              <Text>In local network mode</Text>
+              <Button
+                leftIcon={<ImEnter />}
+                colorScheme="blue"
+                onClick={onOpen}
+              >
+                Switch to internet mode
+              </Button>
+            </>
+          ) : (
+            <>
+              <Text>{`Now on internet mode, room ${match.params.id}`}</Text>
+              <Button
+                leftIcon={<ImEnter />}
+                colorScheme="blue"
+                onClick={() => setRoomNumber(undefined)}
+              >
+                Switch to local mode
+              </Button>
+            </>
+          )}
         </Flex>
         {connectedPeers.length > 0 ? (
           connectedPeers.map((item, index) => {
@@ -431,11 +501,19 @@ export const Home = () => {
             );
           })
         ) : (
-          <Heading size="md" fontWeight="bold" my={3} maxWidth={'500px'}>
-            Devices on your network should appear here soon
+          <Heading size="md" fontWeight="bold" my={3} textAlign="center">
+            Online devices should appear here
           </Heading>
         )}
       </Flex>
+      <ChangeRoomModal
+        isOpen={isOpen}
+        onOpen={onOpen}
+        onClose={onClose}
+        setRoomNumber={setRoomNumber}
+        p2pt={p2pt}
+        setConnectedPeers={setConnectedPeers}
+      />
     </Flex>
   );
 };
