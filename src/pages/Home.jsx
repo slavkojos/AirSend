@@ -73,10 +73,10 @@ export const Home = ({ match }) => {
   const toast = useToast();
   const inputFile = useRef();
   let fileProgress = useRef();
-  let transferSpeed = useRef();
+  let transferSpeed = useRef(0);
   let clientIp = useRef();
-  const toastIdRef = useRef();
-
+  let toastIdRef = useRef();
+  let toastProgressId = useRef();
   const [vantaEffect, setVantaEffect] = useState(0);
   const vantaRef = useRef(null);
   const getPublicIp = async () => {
@@ -138,7 +138,7 @@ export const Home = ({ match }) => {
       setVantaEffect(
         NET({
           el: vantaRef.current,
-          mouseControls: true,
+          mouseControls: false,
           touchControls: true,
           gyroControls: true,
           minHeight: 200.0,
@@ -158,25 +158,18 @@ export const Home = ({ match }) => {
       console.log(`New peer connected with id: ${peer.id}`);
       addNewPeer(peer);
     });
-
-    // if (match.params.id !== undefined) {
-    //   setConnectedPeers([]);
-    //   console.log('changing the identifer');
-    //   p2pt.setIdentifier(`air-send-${match.params.id}`);
-    //   p2pt.start();
-    // } else {
-    //   setConnectedPeers([]);
-    //   p2pt.setIdentifier(`air-send-local`);
-    //   p2pt.start();
-    // }
-    //p2pt.requestMorePeers();
     const done = file => {
       console.log('done');
       if (file) {
         fileDownload(file, file.name);
       }
     };
-
+    const rejectFile = peer => {
+      console.log('reject file');
+      p2pt.send(peer, {
+        type: 'reject',
+      });
+    };
     p2pt.on('trackerconnect', async (tracker, stats) => {
       console.log(tracker);
       console.log('connected to p2p network');
@@ -187,13 +180,11 @@ export const Home = ({ match }) => {
       prevPercent = percent;
     };
     const prepareToRecieve = (peer, fileName, fileSize) => {
-      //console.log("peerid in recieve", peer.id);
-      console.log('peer in spf recieve', peer);
       spf.receive(peer, 'myFileID').then(transfer => {
         transfer.on('progress', progress => {
           fileProgress.current = progress;
 
-          toast.update(toastProgressId, {
+          toast.update(toastProgressId.current, {
             position: 'top-right',
             isClosable: true,
             duration: null,
@@ -208,8 +199,9 @@ export const Home = ({ match }) => {
                   user={peer.nickname}
                   prepareToRecieve={prepareToRecieve}
                   progress={fileProgress.current}
-                  toastProgressId={id}
+                  toastProgressId={toastProgressId.current}
                   transferSpeed={transferSpeed.current}
+                  transfer={transfer}
                 />
               );
             },
@@ -218,11 +210,18 @@ export const Home = ({ match }) => {
         transfer.on('done', file => {
           clearInterval(speedTest);
           prevPercent = 0;
+          transferSpeed.current = 0;
           done(file);
-          toast.close(toastProgressId);
+          toast.close(toastProgressId.current);
         });
         transfer.on('cancelled', () => {
-          console.log('cancelling');
+          toast({
+            title: `Transfer cancelled!`,
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right',
+          });
         });
       });
       p2pt.send(peer, {
@@ -238,8 +237,8 @@ export const Home = ({ match }) => {
         isClosable: true,
         duration: 30000,
         render: ({ id, onClose }) => {
-          toastProgressId = id;
-          console.log('toastProgressId: ' + toastProgressId);
+          toastProgressId.current = id;
+          console.log('toastProgressId: ' + toastProgressId.current);
           return (
             <FileProgress
               peer={peer}
@@ -248,13 +247,13 @@ export const Home = ({ match }) => {
               fileSize={fileSize}
               user={peer.nickname}
               prepareToRecieve={prepareToRecieve}
-              progress={fileProgress}
+              progress={fileProgress.current}
             />
           );
         },
       });
     };
-    let toastProgressId = 0;
+
     const startFileTransfer = peer => {
       console.log('peer in spf send', peer);
       spf.send(peer, 'myFileID', inputFile.current.files[0]).then(transfer => {
@@ -262,7 +261,7 @@ export const Home = ({ match }) => {
           console.log('progress', progress);
           fileProgress.current = progress;
 
-          toast.update(toastProgressId, {
+          toast.update(toastProgressId.current, {
             position: 'top-right',
             isClosable: true,
             duration: null,
@@ -277,7 +276,7 @@ export const Home = ({ match }) => {
                   user={peer.nickname}
                   prepareToRecieve={prepareToRecieve}
                   progress={fileProgress.current}
-                  toastProgressId={id}
+                  toastProgressId={toastProgressId.current}
                   transferSpeed={transferSpeed.current}
                 />
               );
@@ -285,13 +284,20 @@ export const Home = ({ match }) => {
           });
         });
         transfer.on('cancelled', () => {
-          console.log('cancelling');
+          toast({
+            title: `Transfer cancelled!`,
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right',
+          });
         });
         transfer.on('done', () => {
           console.log('successfuly sent the file');
-          toast.close(toastProgressId);
+          toast.close(toastProgressId.current);
           clearInterval(speedTest);
           prevPercent = 0;
+          transferSpeed.current = 0;
           //p2pt.destroy();
         });
         transfer.start();
@@ -308,7 +314,7 @@ export const Home = ({ match }) => {
           isClosable: true,
           duration: 30000,
           render: ({ id, onClose }) => {
-            toastProgressId = id;
+            toastProgressId.current = id;
             console.log('toastProgressId: ' + toastProgressId);
             return (
               <FileProgress
@@ -318,7 +324,7 @@ export const Home = ({ match }) => {
                 fileSize={inputFile.current.files[0].size}
                 user={peer.nickname}
                 prepareToRecieve={prepareToRecieve}
-                progress={fileProgress}
+                progress={fileProgress.current}
               />
             );
           },
@@ -361,6 +367,16 @@ export const Home = ({ match }) => {
         console.log('got the chat message', msg.message);
         displayMesageToast(msg.message, peer.nickname, peer);
       }
+      if (msg.type === 'reject') {
+        toast.close(toastIdRef.current);
+        toast({
+          title: `${peer.nickname} rejected the file`,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right',
+        });
+      }
 
       if (msg.type === 'sending') {
         toast({
@@ -375,6 +391,7 @@ export const Home = ({ match }) => {
               fileSize={msg.fileSize}
               user={peer.nickname}
               prepareToRecieve={prepareToRecieve}
+              rejectFile={rejectFile}
             />
           ),
         });

@@ -45,6 +45,7 @@ export const Device = ({
   inputFile,
 }) => {
   const [chatMessage, setChatMessage] = useState('');
+  const [isButtonDisabled, setDisabled] = useState(false);
 
   const determineBrowserIcon = browser => {
     if (browser.toLowerCase().includes('chrome')) {
@@ -140,13 +141,18 @@ export const Device = ({
           ref={inputFile}
           onChange={e => {
             handleUploadFile(peer, e.target.files[0]);
+            setDisabled(false);
           }}
         />
         <Button
+          disabled={isButtonDisabled}
           my={2}
           colorScheme="blue"
           size="md"
-          onClick={() => inputFile.current.click()}
+          onClick={() => {
+            inputFile.current.click();
+            //setDisabled(true);
+          }}
         >
           Click here to send a file
         </Button>
