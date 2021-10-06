@@ -58,17 +58,17 @@ export const ChangeRoomModal = ({
               mr={3}
               onClick={() => {
                 history.push(roomID.current);
-                setConnectedPeers([]);
-                p2pt.destroy();
-                p2pt.start();
-                p2pt.setIdentifier(`air-send-${roomID.current}`);
                 onClose();
-                window.location.reload();
               }}
             >
               Switch to internet mode
             </Button>
-            <Button variant="outline" colorScheme="blue" color="gray.300">
+            <Button
+              variant="outline"
+              colorScheme="blue"
+              color="gray.300"
+              onClick={onClose}
+            >
               Back to local mode
             </Button>
           </ModalFooter>

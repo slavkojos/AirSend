@@ -36,6 +36,7 @@ import { FileAcceptPrompt } from '../components/FileAcceptPrompt';
 import { FileProgress } from '../components/FileProgress';
 import { ChangeRoomModal } from '../components/ChangeRoomModal';
 import { ImEnter } from 'react-icons/im';
+import { Link as RouterLink } from 'react-router-dom';
 const customConfig = {
   dictionaries: [adjectives, animals],
   separator: ' ',
@@ -122,6 +123,7 @@ export const Home = ({ match }) => {
     });
   };
   useEffect(() => {
+    p2pt.removeAllListeners();
     console.log('useeffect called');
     if (match.params.id !== undefined) {
       setConnectedPeers([]);
@@ -142,7 +144,7 @@ export const Home = ({ match }) => {
           minHeight: 200.0,
           minWidth: 200.0,
           scale: 1.0,
-          scaleMobile: 2.0,
+          scaleMobile: 0.5,
           color: 0x3fc6ff,
           points: 6.0,
           spacing: 18.0,
@@ -387,10 +389,11 @@ export const Home = ({ match }) => {
     });
     p2pt.start();
     return () => {
-      if (vantaEffect) vantaEffect.destroy();
+      //if (vantaEffect) vantaEffect.destroy();
       if (p2pt) p2pt.destroy();
+      p2pt.removeAllListeners();
     };
-  }, []);
+  }, [match.params.id]);
 
   const handleUploadFile = (peer, file) => {
     console.log('sendingggggggg');
@@ -467,7 +470,12 @@ export const Home = ({ match }) => {
           ) : (
             <>
               <Text>{`Now on internet mode, room ${match.params.id}`}</Text>
-              <Button leftIcon={<ImEnter />} colorScheme="blue">
+              <Button
+                leftIcon={<ImEnter />}
+                colorScheme="blue"
+                as={RouterLink}
+                to="/"
+              >
                 Switch to local mode
               </Button>
             </>
