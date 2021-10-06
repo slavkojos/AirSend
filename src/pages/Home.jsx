@@ -60,19 +60,14 @@ const trackersAnnounceURLs = [
 ];
 
 const p2pt = new P2PT(trackersAnnounceURLs, 'air-send-local');
+
 let userInfo = {
   id: p2pt._peerId,
   nickname: uniqueNamesGenerator(customConfig),
 };
 export const Home = ({ match }) => {
-  let identifer = 'air-send-local';
-  match.params.id === undefined
-    ? (identifer = 'air-send-local')
-    : (identifer = match.params.id);
-
-  console.log('My peer id : ' + p2pt._peerId, identifer);
+  console.log('My peer id : ' + p2pt._peerId);
   const [connectedPeers, setConnectedPeers] = useState([]);
-  const [roomNumber, setRoomNumber] = useState('');
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const inputFile = useRef();
@@ -126,21 +121,17 @@ export const Home = ({ match }) => {
       ),
     });
   };
-  useCallback(() => {
+  useEffect(() => {
+    console.log('useeffect called');
     if (match.params.id !== undefined) {
-      p2pt.destroy();
       setConnectedPeers([]);
       console.log('changing');
       p2pt.setIdentifier(`air-send-${match.params.id}`);
     } else {
-      p2pt.destroy();
       setConnectedPeers([]);
       console.log('on local');
+      p2pt.setIdentifier(`air-send-local`);
     }
-  }, [match.params.id]);
-  useEffect(() => {
-    console.log('useeffect called');
-
     if (!vantaEffect) {
       setVantaEffect(
         NET({
@@ -476,11 +467,7 @@ export const Home = ({ match }) => {
           ) : (
             <>
               <Text>{`Now on internet mode, room ${match.params.id}`}</Text>
-              <Button
-                leftIcon={<ImEnter />}
-                colorScheme="blue"
-                onClick={() => setRoomNumber(undefined)}
-              >
+              <Button leftIcon={<ImEnter />} colorScheme="blue">
                 Switch to local mode
               </Button>
             </>
@@ -507,12 +494,12 @@ export const Home = ({ match }) => {
         )}
       </Flex>
       <ChangeRoomModal
+        useInert={false}
         isOpen={isOpen}
         onOpen={onOpen}
         onClose={onClose}
-        setRoomNumber={setRoomNumber}
-        p2pt={p2pt}
         setConnectedPeers={setConnectedPeers}
+        p2pt={p2pt}
       />
     </Flex>
   );

@@ -13,14 +13,15 @@ import {
   Flex,
 } from '@chakra-ui/react';
 import { useLocation, useHistory, Link as RouterLink } from 'react-router-dom';
-import QRCode from 'qrcode.react';
+//import QRCode from 'qrcode.react';
+import QRCode from 'react-qr-code';
 import cryptoRandomString from 'crypto-random-string';
 import { useEffect, useState, useRef } from 'react';
 export const ChangeRoomModal = ({
   isOpen,
   onOpen,
   onClose,
-  setRoomNumber,
+
   p2pt,
   setConnectedPeers,
 }) => {
@@ -56,9 +57,13 @@ export const ChangeRoomModal = ({
               colorScheme="blue"
               mr={3}
               onClick={() => {
-                onClose();
                 history.push(roomID.current);
                 setConnectedPeers([]);
+                p2pt.destroy();
+                p2pt.start();
+                p2pt.setIdentifier(`air-send-${roomID.current}`);
+                onClose();
+                window.location.reload();
               }}
             >
               Switch to internet mode
