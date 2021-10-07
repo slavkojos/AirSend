@@ -1,25 +1,10 @@
 import React from 'react';
-import {
-  ChakraProvider,
-  Box,
-  Text,
-  Link,
-  VStack,
-  Code,
-  Grid,
-  Flex,
-} from '@chakra-ui/react';
-import { ColorModeSwitcher } from './ColorModeSwitcher';
-import { Logo } from './Logo';
+import { ChakraProvider } from '@chakra-ui/react';
+//import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { Home } from './pages/Home';
 import theme from './theme';
 import GithubCorner from 'react-github-corner';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link as RouterLink,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 function App() {
   return (

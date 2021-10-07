@@ -1,41 +1,15 @@
-import {
-  ChakraProvider,
-  Box,
-  Text,
-  Link,
-  VStack,
-  Code,
-  Grid,
-  theme,
-  Flex,
-  Image,
-  Heading,
-  Button,
-  IconButton,
-  Icon,
-  CloseButton,
-  useClipboard,
-  Progress,
-} from '@chakra-ui/react';
-import { FaCheck } from 'react-icons/fa';
+import { Text, Flex, Button, CloseButton, Progress } from '@chakra-ui/react';
 import { MdCancel } from 'react-icons/md';
-import { useState } from 'react';
 import { IoIosSpeedometer } from 'react-icons/io';
 
 export const FileProgress = ({
   fileName,
   fileSize,
-  user,
-  peer,
   close,
-  prepareToRecieve,
   progress,
-  toastProgressId,
   transferSpeed,
   transfer,
 }) => {
-  console.log('progress in fileprogress: ' + progress);
-  console.log('toastProgressId in fileprogress: ' + toastProgressId);
   return (
     <Flex
       maxHeight="300px"

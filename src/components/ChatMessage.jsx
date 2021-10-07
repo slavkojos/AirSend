@@ -1,17 +1,7 @@
 import {
-  ChakraProvider,
-  Box,
   Text,
-  Link,
-  VStack,
-  Code,
-  Grid,
-  theme,
   Flex,
-  Image,
-  Heading,
   Button,
-  IconButton,
   Icon,
   CloseButton,
   useClipboard,
@@ -19,7 +9,7 @@ import {
 import { FaUser } from 'react-icons/fa';
 import { RiMessage2Fill } from 'react-icons/ri';
 
-export const ChatMessage = ({ message, user, peer, close }) => {
+export const ChatMessage = ({ message, user, close }) => {
   const { hasCopied, onCopy } = useClipboard(message);
   return (
     <Flex

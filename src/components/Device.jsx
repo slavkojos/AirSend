@@ -1,27 +1,9 @@
-import {
-  Box,
-  Flex,
-  Heading,
-  Icon,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  InputRightElement,
-  Button,
-  IconButton,
-} from '@chakra-ui/react';
-import { useState, useRef } from 'react';
+import { Flex, Icon, Input, Button, IconButton } from '@chakra-ui/react';
+import { useState } from 'react';
 import { RiComputerLine } from 'react-icons/ri';
 import { GiSmartphone } from 'react-icons/gi';
 import { IoMdText } from 'react-icons/io';
-import {
-  FaOpera,
-  FaChrome,
-  FaEdge,
-  FaFirefox,
-  FaSafari,
-  FaUser,
-} from 'react-icons/fa';
+import { FaOpera, FaChrome, FaEdge, FaFirefox, FaSafari } from 'react-icons/fa';
 import { MdSend } from 'react-icons/md';
 import './Device.css';
 import { DeviceDetail } from './DeviceDetail';

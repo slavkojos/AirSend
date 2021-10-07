@@ -1,33 +1,23 @@
 import {
-  ChakraProvider,
-  Box,
   Text,
-  Link,
-  VStack,
-  Code,
-  Grid,
-  theme,
   Flex,
   Image,
   Heading,
   useToast,
   Avatar,
-  SimpleGrid,
   Button,
   useDisclosure,
 } from '@chakra-ui/react';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import SimplePeerFiles from 'simple-peer-files';
 import DeviceDetector from 'device-detector-js';
 import {
   uniqueNamesGenerator,
-  Config,
   adjectives,
-  colors,
   animals,
 } from 'unique-names-generator';
 import NET from 'vanta/dist/vanta.net.min';
-import logo from '../assets/logo.png';
+//import logo from '../assets/logo.png';
 import logo_light from '../assets/logo_light.png';
 import './Home.css';
 import { Device } from '../components/Device';
@@ -67,7 +57,6 @@ let userInfo = {
   nickname: uniqueNamesGenerator(customConfig),
 };
 export const Home = ({ match }) => {
-  console.log('My peer id : ' + p2pt._peerId);
   const [connectedPeers, setConnectedPeers] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
@@ -98,7 +87,7 @@ export const Home = ({ match }) => {
     //     });
     //   }
     // }
-    console.log('clientip', clientIp.current);
+
     p2pt.send(peer, {
       type: 'device-info',
       device: device,
@@ -124,14 +113,14 @@ export const Home = ({ match }) => {
   };
   useEffect(() => {
     p2pt.removeAllListeners();
-    console.log('useeffect called');
+
     if (match.params.id !== undefined) {
       setConnectedPeers([]);
-      console.log('changing');
+
       p2pt.setIdentifier(`air-send-${match.params.id}`);
     } else {
       setConnectedPeers([]);
-      console.log('on local');
+
       p2pt.setIdentifier(`air-send-local`);
     }
     if (!vantaEffect) {
@@ -152,29 +141,22 @@ export const Home = ({ match }) => {
         })
       );
     }
-    console.log(vantaEffect);
+
     getPublicIp();
     p2pt.on('peerconnect', peer => {
-      console.log('peer remote address', peer);
-      console.log(`New peer connected with id: ${peer.id}`);
       addNewPeer(peer);
     });
     const done = file => {
-      console.log('done');
       if (file) {
         fileDownload(file, file.name);
       }
     };
     const rejectFile = peer => {
-      console.log('reject file');
       p2pt.send(peer, {
         type: 'reject',
       });
     };
-    p2pt.on('trackerconnect', async (tracker, stats) => {
-      console.log(tracker);
-      console.log('connected to p2p network');
-    });
+    p2pt.on('trackerconnect', async (tracker, stats) => {});
     let prevPercent = 0;
     const calculateTransferSpeed = (percent, fileSize) => {
       transferSpeed.current = ((percent - prevPercent) * fileSize) / 100;
@@ -190,7 +172,6 @@ export const Home = ({ match }) => {
             isClosable: true,
             duration: null,
             render: ({ id, onClose }) => {
-              console.log('file progressssss', fileProgress);
               return (
                 <FileProgress
                   peer={peer}
@@ -239,7 +220,7 @@ export const Home = ({ match }) => {
         duration: 30000,
         render: ({ id, onClose }) => {
           toastProgressId.current = id;
-          console.log('toastProgressId: ' + toastProgressId.current);
+
           return (
             <FileProgress
               peer={peer}
@@ -256,10 +237,8 @@ export const Home = ({ match }) => {
     };
 
     const startFileTransfer = peer => {
-      console.log('peer in spf send', peer);
       spf.send(peer, 'myFileID', inputFile.current.files[0]).then(transfer => {
         transfer.on('progress', progress => {
-          console.log('progress', progress);
           fileProgress.current = progress;
 
           toast.update(toastProgressId.current, {
@@ -267,7 +246,6 @@ export const Home = ({ match }) => {
             isClosable: true,
             duration: null,
             render: ({ id, onClose }) => {
-              console.log('file progressssss', fileProgress);
               return (
                 <FileProgress
                   peer={peer}
@@ -294,7 +272,6 @@ export const Home = ({ match }) => {
           });
         });
         transfer.on('done', () => {
-          console.log('successfuly sent the file');
           toast.close(toastProgressId.current);
           clearInterval(speedTest);
           prevPercent = 0;
@@ -316,7 +293,7 @@ export const Home = ({ match }) => {
           duration: 30000,
           render: ({ id, onClose }) => {
             toastProgressId.current = id;
-            console.log('toastProgressId: ' + toastProgressId);
+
             return (
               <FileProgress
                 peer={peer}
@@ -334,7 +311,6 @@ export const Home = ({ match }) => {
     };
 
     p2pt.on('peerclose', peer => {
-      console.log(`A peer has disconnected with id: ${peer.id}`);
       setConnectedPeers(connectedPeers => {
         return connectedPeers.filter(item => {
           return item.id !== peer.id;
@@ -344,17 +320,15 @@ export const Home = ({ match }) => {
     });
 
     p2pt.on('data', (peer, data) => {
-      //console.log(data);
+      //
     });
 
     p2pt.on('msg', async (peer, msg) => {
       if (msg.type === 'device-info') {
-        console.log('got the device info', msg.device);
         peer.nickname = msg.nickname;
         peer.device = msg.device;
         peer.ip = msg.ip;
-        console.log('peer ip', msg.ip);
-        console.log('client ip', clientIp);
+
         if (match.params.id !== undefined) {
           setConnectedPeers(prevPeers => [...prevPeers, peer]);
           vantaEffect.resize();
@@ -368,7 +342,6 @@ export const Home = ({ match }) => {
       }
 
       if (msg.type === 'chat') {
-        console.log('got the chat message', msg.message);
         displayMesageToast(msg.message, peer.nickname, peer);
       }
       if (msg.type === 'reject') {
@@ -403,7 +376,6 @@ export const Home = ({ match }) => {
       }
 
       if (msg.type === 'ready') {
-        console.log('got the message that reciever is ready');
         toast.close(toastIdRef.current);
         startFileTransfer(peer);
       }
@@ -417,9 +389,6 @@ export const Home = ({ match }) => {
   }, [match.params.id, vantaEffect]);
 
   const handleUploadFile = (peer, file) => {
-    console.log('sendingggggggg');
-    console.log(file);
-
     p2pt.send(peer, {
       type: 'sending',
       fileId: file.name,

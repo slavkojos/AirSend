@@ -1,21 +1,4 @@
-import {
-  ChakraProvider,
-  Box,
-  Text,
-  Link,
-  VStack,
-  Code,
-  Grid,
-  theme,
-  Flex,
-  Image,
-  Heading,
-  Button,
-  IconButton,
-  Icon,
-  CloseButton,
-  useClipboard,
-} from '@chakra-ui/react';
+import { Text, Flex, Button, CloseButton } from '@chakra-ui/react';
 import { FaCheck } from 'react-icons/fa';
 import { MdCancel } from 'react-icons/md';
 

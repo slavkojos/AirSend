@@ -1,14 +1,4 @@
-import { Box, Flex, Heading, Icon, Avatar } from '@chakra-ui/react';
-import { RiComputerLine } from 'react-icons/ri';
-import { GiSmartphone } from 'react-icons/gi';
-import {
-  FaOpera,
-  FaChrome,
-  FaEdge,
-  FaFirefox,
-  FaSafari,
-  FaUser,
-} from 'react-icons/fa';
+import { Flex, Heading, Icon, Avatar } from '@chakra-ui/react';
 
 export const DeviceDetail = ({ icon, info, fontSize, maxWidth }) => {
   return (

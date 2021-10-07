@@ -6,25 +6,17 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  useDisclosure,
   Button,
   useClipboard,
   Text,
   Flex,
 } from '@chakra-ui/react';
-import { useLocation, useHistory, Link as RouterLink } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 //import QRCode from 'qrcode.react';
 import QRCode from 'react-qr-code';
 import cryptoRandomString from 'crypto-random-string';
 import { useEffect, useState, useRef } from 'react';
-export const ChangeRoomModal = ({
-  isOpen,
-  onOpen,
-  onClose,
-
-  p2pt,
-  setConnectedPeers,
-}) => {
+export const ChangeRoomModal = ({ isOpen, onOpen, onClose }) => {
   let roomID = useRef();
   let fullUrl = window.location.href;
   const [customUrl, setCustomUrl] = useState('');
