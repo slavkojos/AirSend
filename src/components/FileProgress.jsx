@@ -32,6 +32,7 @@ export const FileProgress = ({
   progress,
   toastProgressId,
   transferSpeed,
+  transfer,
 }) => {
   console.log('progress in fileprogress: ' + progress);
   console.log('toastProgressId in fileprogress: ' + toastProgressId);
@@ -48,9 +49,7 @@ export const FileProgress = ({
       align="stretch"
     >
       <Flex direction="column">
-        <Text>
-          {fileName},{fileSize}
-        </Text>
+        <Text>{`${fileName},(${(fileSize / 1048576).toFixed(2)} MB)`}</Text>
         <Flex my={1} direction="column" justify="flex-start" align="flex-start">
           <Progress
             colorScheme="green"
@@ -65,7 +64,7 @@ export const FileProgress = ({
           <Text>{Math.round(progress)}%</Text>
           <Flex>
             <Button
-              leftIcon={IoIosSpeedometer}
+              leftIcon={<IoIosSpeedometer />}
               colorScheme="teal"
               variant="solid"
             >
@@ -75,7 +74,10 @@ export const FileProgress = ({
               leftIcon={<MdCancel />}
               colorScheme="red"
               variant="solid"
-              onClick={close}
+              onClick={() => {
+                transfer.cancel();
+                close();
+              }}
             >
               Cancel transfer
             </Button>

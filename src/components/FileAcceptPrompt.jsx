@@ -26,6 +26,7 @@ export const FileAcceptPrompt = ({
   peer,
   close,
   prepareToRecieve,
+  rejectFile,
 }) => {
   return (
     <Flex
@@ -38,6 +39,7 @@ export const FileAcceptPrompt = ({
       justify="space-between"
       maxWidth="500px"
       align="stretch"
+      color="black"
     >
       <Flex direction="column">
         <Text>
@@ -59,7 +61,10 @@ export const FileAcceptPrompt = ({
             leftIcon={<MdCancel />}
             colorScheme="red"
             variant="solid"
-            onClick={close}
+            onClick={() => {
+              rejectFile(peer);
+              close();
+            }}
           >
             Reject
           </Button>
