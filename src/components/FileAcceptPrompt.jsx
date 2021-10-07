@@ -39,6 +39,7 @@ export const FileAcceptPrompt = ({
       justify="space-between"
       maxWidth="500px"
       align="stretch"
+      color="black"
     >
       <Flex direction="column">
         <Text>

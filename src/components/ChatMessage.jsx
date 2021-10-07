@@ -49,7 +49,7 @@ export const ChatMessage = ({ message, user, peer, close }) => {
           p={2}
           my={2}
         >
-          {hasCopied ? 'Copied' : 'Copy'}
+          {hasCopied ? 'Copied' : 'Copy message'}
         </Button>
       </Flex>
       <CloseButton fontSize="12px" onClick={close} />

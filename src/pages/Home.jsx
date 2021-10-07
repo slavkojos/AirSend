@@ -77,7 +77,7 @@ export const Home = ({ match }) => {
   let clientIp = useRef();
   let toastIdRef = useRef();
   let toastProgressId = useRef();
-  const [vantaEffect, setVantaEffect] = useState(0);
+  const [vantaEffect, setVantaEffect] = useState();
   const vantaRef = useRef(null);
   const getPublicIp = async () => {
     const response = await fetch('https://api.bigdatacloud.net/data/client-ip');
@@ -152,6 +152,7 @@ export const Home = ({ match }) => {
         })
       );
     }
+    console.log(vantaEffect);
     getPublicIp();
     p2pt.on('peerconnect', peer => {
       console.log('peer remote address', peer);
@@ -339,6 +340,7 @@ export const Home = ({ match }) => {
           return item.id !== peer.id;
         });
       });
+      vantaEffect.resize();
     });
 
     p2pt.on('data', (peer, data) => {
@@ -355,11 +357,13 @@ export const Home = ({ match }) => {
         console.log('client ip', clientIp);
         if (match.params.id !== undefined) {
           setConnectedPeers(prevPeers => [...prevPeers, peer]);
+          vantaEffect.resize();
         } else if (
           peer.ip === clientIp.current &&
           clientIp.current !== undefined
         ) {
           setConnectedPeers(prevPeers => [...prevPeers, peer]);
+          vantaEffect.resize();
         }
       }
 
@@ -410,7 +414,7 @@ export const Home = ({ match }) => {
       if (p2pt) p2pt.destroy();
       p2pt.removeAllListeners();
     };
-  }, [match.params.id]);
+  }, [match.params.id, vantaEffect]);
 
   const handleUploadFile = (peer, file) => {
     console.log('sendingggggggg');
@@ -447,6 +451,8 @@ export const Home = ({ match }) => {
       align="center"
       color="gray.300"
       minHeight="100vh"
+      height="100%"
+      width="100%"
       ref={vantaRef}
     >
       <Image
@@ -463,7 +469,7 @@ export const Home = ({ match }) => {
           borderRadius="2xl"
           p={2}
           px={4}
-          className="user"
+          className={match.params.id === undefined ? 'local' : 'internet'}
         >
           <Avatar
             h={24}

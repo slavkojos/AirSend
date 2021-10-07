@@ -44,8 +44,12 @@ export const ChangeRoomModal = ({
           <ModalCloseButton />
           <ModalBody>
             <Flex direction="column" w={'100%'} align="center" justify="center">
-              <Text>Scan this QR code or share the link below</Text>
-              <Text fontWeight="bold">{customUrl}</Text>
+              <Text textAlign="center">
+                Scan this QR code or share the link below
+              </Text>
+              <Text textAlign="center" fontWeight="bold">
+                {customUrl}
+              </Text>
               <Button onClick={onCopy} ml={2} colorScheme="blue" my={4}>
                 {hasCopied ? 'Copied!' : 'Copy link'}
               </Button>
