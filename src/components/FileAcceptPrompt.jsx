@@ -20,14 +20,14 @@ export const FileAcceptPrompt = ({
       bg={'orange.300'}
       borderRadius="10px"
       justify="space-between"
-      maxWidth="500px"
+      maxWidth="550px"
       align="stretch"
       color="black"
     >
-      <Flex direction="column">
-        <Text>
-          {user} is trying to send you file named {fileName},{fileSize}
-        </Text>
+      <Flex direction="column" width="100%">
+        <Text fontSize="lg">{`${user} is sending you this:`}</Text>
+        <Text as="i" isTruncated maxWidth="90%">{`${fileName}`}</Text>
+        <Text fontWeight="bold">{`${(fileSize / 1048576).toFixed(2)} MB`}</Text>
         <Flex justify="space-between" align="center" my={1}>
           <Button
             leftIcon={<FaCheck />}

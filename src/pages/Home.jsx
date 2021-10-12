@@ -146,14 +146,22 @@ export const Home = ({ match }) => {
     p2pt.on('peerconnect', peer => {
       addNewPeer(peer);
     });
+
     const done = file => {
       if (file) {
         fileDownload(file, file.name);
       }
     };
+
     const rejectFile = peer => {
       p2pt.send(peer, {
         type: 'reject',
+      });
+    };
+
+    const cancelFileTransfer = peer => {
+      p2pt.send(peer, {
+        type: 'cancel-transfer',
       });
     };
     p2pt.on('trackerconnect', async (tracker, stats) => {});
@@ -197,6 +205,7 @@ export const Home = ({ match }) => {
           toast.close(toastProgressId.current);
         });
         transfer.on('cancelled', () => {
+          cancelFileTransfer(peer);
           toast({
             title: `Transfer cancelled!`,
             status: 'error',
@@ -204,6 +213,7 @@ export const Home = ({ match }) => {
             isClosable: true,
             position: 'top-right',
           });
+          transfer.cancel();
         });
       });
       p2pt.send(peer, {
@@ -257,12 +267,15 @@ export const Home = ({ match }) => {
                   progress={fileProgress.current}
                   toastProgressId={toastProgressId.current}
                   transferSpeed={transferSpeed.current}
+                  transfer={transfer}
                 />
               );
             },
           });
         });
         transfer.on('cancelled', () => {
+          console.log('cancelled on send');
+          cancelFileTransfer(peer);
           toast({
             title: `Transfer cancelled!`,
             status: 'error',
@@ -270,6 +283,8 @@ export const Home = ({ match }) => {
             isClosable: true,
             position: 'top-right',
           });
+          toast.close(toastProgressId.current);
+          transfer.cancel();
         });
         transfer.on('done', () => {
           toast.close(toastProgressId.current);
@@ -303,6 +318,7 @@ export const Home = ({ match }) => {
                 user={peer.nickname}
                 prepareToRecieve={prepareToRecieve}
                 progress={fileProgress.current}
+                cancelFileTransfer={cancelFileTransfer}
               />
             );
           },
@@ -319,9 +335,7 @@ export const Home = ({ match }) => {
       vantaEffect.resize();
     });
 
-    p2pt.on('data', (peer, data) => {
-      //
-    });
+    p2pt.on('data', (peer, data) => {});
 
     p2pt.on('msg', async (peer, msg) => {
       if (msg.type === 'device-info') {
@@ -348,6 +362,17 @@ export const Home = ({ match }) => {
         toast.close(toastIdRef.current);
         toast({
           title: `${peer.nickname} rejected the file`,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right',
+        });
+      }
+
+      if (msg.type === 'cancel-transfer') {
+        toast.close(toastProgressId.current);
+        toast({
+          title: `${peer.nickname} cancelled the transfer`,
           status: 'error',
           duration: 5000,
           isClosable: true,
