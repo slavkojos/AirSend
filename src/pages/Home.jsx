@@ -205,6 +205,7 @@ export const Home = ({ match }) => {
           toast.close(toastProgressId.current);
         });
         transfer.on('cancelled', () => {
+          clearInterval(speedTest);
           cancelFileTransfer(peer);
           toast({
             title: `Transfer cancelled!`,
@@ -214,6 +215,7 @@ export const Home = ({ match }) => {
             position: 'top-right',
           });
           transfer.cancel();
+          toast.close(toastProgressId.current);
         });
       });
       p2pt.send(peer, {
@@ -274,6 +276,7 @@ export const Home = ({ match }) => {
           });
         });
         transfer.on('cancelled', () => {
+          clearInterval(speedTest);
           console.log('cancelled on send');
           cancelFileTransfer(peer);
           toast({
@@ -372,7 +375,7 @@ export const Home = ({ match }) => {
       if (msg.type === 'cancel-transfer') {
         toast.close(toastProgressId.current);
         toast({
-          title: `${peer.nickname} cancelled the transfer`,
+          title: `Transfer cancelled`,
           status: 'error',
           duration: 5000,
           isClosable: true,
