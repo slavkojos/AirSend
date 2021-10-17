@@ -149,7 +149,14 @@ export const Home = ({ match }) => {
 
     const done = file => {
       if (file) {
-        fileDownload(file, file.name);
+        //fileDownload(file, file.name);
+        const objectURL = URL.createObjectURL(file);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = objectURL;
+        downloadLink.download = file.name;
+        downloadLink.click();
+        URL.revokeObjectURL(objectURL);
+        downloadLink.remove();
       }
     };
 
@@ -203,6 +210,13 @@ export const Home = ({ match }) => {
           transferSpeed.current = 0;
           done(file);
           toast.close(toastProgressId.current);
+          toast({
+            title: `Transfer complete`,
+            status: 'success',
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right',
+          });
         });
         transfer.on('cancelled', () => {
           clearInterval(speedTest);
@@ -295,6 +309,13 @@ export const Home = ({ match }) => {
           prevPercent = 0;
           transferSpeed.current = 0;
           //p2pt.destroy();
+          toast({
+            title: `Transfer complete`,
+            status: 'success',
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right',
+          });
         });
         transfer.start();
         let speedTest = setInterval(
