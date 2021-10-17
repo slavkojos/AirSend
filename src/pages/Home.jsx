@@ -150,13 +150,30 @@ export const Home = ({ match }) => {
     const done = file => {
       if (file) {
         //fileDownload(file, file.name);
-        const objectURL = URL.createObjectURL(file);
-        const downloadLink = document.createElement('a');
-        downloadLink.href = objectURL;
-        downloadLink.download = file.name;
-        downloadLink.click();
-        URL.revokeObjectURL(objectURL);
-        downloadLink.remove();
+
+        // const objectURL = URL.createObjectURL(file);
+        // const downloadLink = document.createElement('a');
+        // downloadLink.href = objectURL;
+        // downloadLink.download = file.name;
+        // downloadLink.click();
+        // URL.revokeObjectURL(objectURL);
+        // downloadLink.remove();
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const arrayBuffer = reader.result;
+          const blob = new Blob([arrayBuffer], {
+            type: 'application/octet-stream',
+          });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = file.name;
+          a.click();
+          URL.revokeObjectURL(url);
+          a.remove();
+        };
+        reader.readAsArrayBuffer(file);
       }
     };
 
