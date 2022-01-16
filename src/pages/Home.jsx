@@ -48,6 +48,8 @@ const P2PT = require('p2pt');
 const trackersAnnounceURLs = [
   'wss://spacetradersapi-chatbox.herokuapp.com:443/announce',
   'wss://tracker.openwebtorrent.com',
+  'wss://tracker.files.fm:7073/announce',
+  'wss://tracker.btorrent.xyz:443',
 ];
 
 const p2pt = new P2PT(trackersAnnounceURLs, 'air-send-local');
